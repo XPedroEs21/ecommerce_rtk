@@ -1,19 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './ProductList.css'; 
+import { useDispatch } from 'react-redux';
+import { addItemToCart } from './CartSlice';                                             //addItemToCart is used to get the reducer function detail to dispatch which product is added to the cart to store.js.
 
 const ProductList = () => {
-
+  const dispatch = useDispatch();
+  const [disabledProducts, setDisabledProducts] = useState([]);                         //State to store disabled products
   const products = [
     { id: 1, name: 'Product A', price: 60 },
     { id: 2, name: 'Product B', price: 75 },
     { id: 3, name: 'Product C', price: 30 },
   ];
+  const handleAddToCart = product => {
+    dispatch(addItemToCart(product));
+    setDisabledProducts([...disabledProducts, product.id]);                            //Mark the product as disabled
+  };
 
   return (
     <div className="product-list">
       <h2 className="product-list-title">Products</h2>
       <ul className="product-list-items">
-     
+      {products.map(product => (
+        <li key={product.id} className='product-list-item'>
+          <span>{product.name} - ${product.price}</span>
+          <button                                                                        //This button, when clicked, invokes the handleAddToCart function with the product as an argument.
+          className={`add-to-cart-btn ${disabledProducts.includes(product.id) ? 'disabled' : ''}`}
+          onClick={() => handleAddToCart(product)}
+          disabled={disabledProducts.includes(product.id)}>                             {/*Disable button if product is in disabledProducts*/}
+            Add to cart
+          </button>
+        </li>
+      ))}
       </ul>
     </div>
   );
